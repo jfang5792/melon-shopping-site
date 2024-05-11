@@ -6,7 +6,7 @@ put melons in a shopping cart.
 Authors: Joel Burton, Christian Fernandez, Meggie Mahnken, Katie Byers.
 """
 
-from flask import Flask, render_template, redirect, flash
+from flask import Flask, render_template, redirect, flash, session
 import jinja2
 
 import melons
@@ -50,7 +50,7 @@ def show_melon(melon_id):
     Show all info about a melon. Also, provide a button to buy that melon.
     """
 
-    melon = melons.get_by_id("meli")
+    melon = melons.get_by_id(melon_id)
     print(melon)
     return render_template("melon_details.html",
                            display_melon=melon)
@@ -63,8 +63,19 @@ def add_to_cart(melon_id):
     When a melon is added to the cart, redirect browser to the shopping cart
     page and display a confirmation message: 'Melon successfully added to
     cart'."""
+    # session = request.args.get(melon_id)
 
-    # TODO: Finish shopping cart functionality
+    if 'cart' not in session:
+        session['cart'] = {}
+
+    if melon_id not in session['cart']:
+        session['cart'][melon_id] = 0
+    session['cart'][melon_id] += 1
+
+    # session['cart'][melon_id] = session['cart'].get(melon_id, 0) + 1
+
+    flash('Success: melon added to cart')
+    return render_template("cart.html")
 
     # The logic here should be something like:
     #
@@ -75,8 +86,7 @@ def add_to_cart(melon_id):
     # - flash a success message
     # - redirect the user to the cart page
 
-    return "Oops! This needs to be implemented!"
-
+    #return "Oops! This needs to be implemented!"
 
 @app.route("/cart")
 def show_shopping_cart():
@@ -147,4 +157,4 @@ def checkout():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0")
+    app.run(debug=True, host="0.0.0.0", port=5001)
